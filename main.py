@@ -1,9 +1,10 @@
 from fastapi import FastAPI
+from con_db import obtener_conexion
 
 api = FastAPI()
 
 #Recurso_data rutas, paradas y horarios
-rutas = [
+'''rutas = [
     {
         "id": 1,
         "nombre": "Ruta Norte",
@@ -34,7 +35,7 @@ rutas = [
             "Universidad"
         ]
     }
-]
+]'''
 
 #Endpoint general
 @api.get("/")
@@ -46,7 +47,20 @@ def inicio():
 #Endpoint rutas
 @api.get("/rutas")
 def consultar_rutas():
-    return rutas
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+
+    cursor.execute("""
+        SELECT id_ruta, nombre, descripcion, estado
+        FROM rutas
+    """)
+
+    resultados = cursor.fetchall()
+
+    cursor.close()
+    conexion.close()
+
+    return resultados
 
 #Endpoint rutas por ID
 @api.get("/rutas/{id}")
