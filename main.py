@@ -62,44 +62,73 @@ def consultar_rutas():
 
     return resultados
 
-#Endpoint rutas por ID
-@api.get("/rutas/{id}")
-def consultar_ruta(id: int):
+@api.post("/rutas")
+def crear_ruta(
+    nombre: str,
+    descripcion: str,
+    estado: str = "ACTIVA"
+):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
 
-    for ruta in rutas:
-        if ruta["id"] == id:
-            return ruta
+    cursor.execute("""
+        INSERT INTO rutas (nombre, descripcion, estado)
+        VALUES (%s, %s, %s)
+        RETURNING id_ruta;
+    """, (nombre, descripcion, estado))
+
+    id_ruta = cursor.fetchone()[0]
+
+    conexion.commit()
+
+    cursor.close()
+    conexion.close()
 
     return {
-        "mensaje": "Ruta no encontrada"
+        "mensaje": "Ruta creada correctamente",
+        "id_ruta": id_ruta
     }
+
+
+
+#Endpoint rutas por ID
+# @api.get("/rutas/{id}")
+# def consultar_ruta(id: int):
+
+#     for ruta in rutas:
+#         if ruta["id"] == id:
+#             return ruta
+
+#     return {
+#         "mensaje": "Ruta no encontrada"
+#     }
 
 #Endpoint rutas por ID y paradas
-@api.get("/rutas/{id}/paradas")
-def consultar_paradas(id: int):
+# @api.get("/rutas/{id}/paradas")
+# def consultar_paradas(id: int):
 
-    for ruta in rutas:
-        if ruta["id"] == id:
-            return {
-                "ruta": ruta["nombre"],
-                "paradas": ruta["paradas"]
-            }
-    return {
-        "mensaje": "Ruta no encontrada"
-    }
+#     for ruta in rutas:
+#         if ruta["id"] == id:
+#             return {
+#                 "ruta": ruta["nombre"],
+#                 "paradas": ruta["paradas"]
+#             }
+#     return {
+#         "mensaje": "Ruta no encontrada"
+#     }
 
 #Endpoint rutas por ID y horarios
-@api.get("/rutas/{id}/horario")
-def consultar_horario(id: int):
+# @api.get("/rutas/{id}/horario")
+# def consultar_horario(id: int):
 
-    for ruta in rutas:
-        if ruta["id"] == id:
-            return {
-                "ruta": ruta["nombre"],
-                "horario": ruta["horario"]
-            }
+#     for ruta in rutas:
+#         if ruta["id"] == id:
+#             return {
+#                 "ruta": ruta["nombre"],
+#                 "horario": ruta["horario"]
+#             }
 
-    return {
-        "mensaje": "Ruta no encontrada"
-    }
+#     return {
+#         "mensaje": "Ruta no encontrada"
+#     }
 
